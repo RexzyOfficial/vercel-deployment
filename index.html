@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vercel Instant Deployer</title>
+    <style>
+        /* === RESET & BASE STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+
+        /* === HEADER STYLES === */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            color: #2d3748;
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: #718096;
+            font-size: 1.2em;
+        }
+
+        /* === BUTTON STYLES === */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #718096;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #4a5568;
+            transform: translateY(-2px);
+        }
+
+        /* === FORM STYLES === */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1.1em;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        input[type="text"]:focus {
+            border-color: #667eea;
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            background: #f7fafc;
+            transition: all 0.3s ease;
+        }
+
+        input[type="file"]:hover {
+            border-color: #667eea;
+            background: #edf2f7;
+        }
+
+        /* === FILE LIST STYLES === */
+        .file-list {
+            margin-top: 15px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .file-item {
+            background: white;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: #2d3748;
+        }
+
+        .file-size {
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        /* === LOADING STYLES === */
+        .loading {
+            text-align: center;
+            padding: 60px 40px;
+            background: #f7fafc;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: #4a5568;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .loading-dots:after {
+            content: '';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* === RESULT STYLES === */
+        .result {
+            text-align: center;
+            padding: 50px 40px;
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            border-radius: 15px;
+            margin: 20px 0;
+            color: white;
+        }
+
+        .result h3 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .result p {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .deploy-link {
+            display: inline-block;
+            background: white;
+            color: #48bb78;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1.3em;
+            font-weight: 600;
+            text-decoration: none;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .deploy-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        /* === PROJECTS LIST STYLES === */
+        .projects-section {
+            margin-top: 50px;
+        }
+
+        .projects-section h2 {
+            color: #2d3748;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .projects-list {
+            display: grid;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .project-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .project-name {
+            font-weight: bold;
+            color: #2d3748;
+            font-size: 1.3em;
+            margin-bottom: 8px;
+        }
+
+        .project-site {
+            color: #718096;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .project-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1em;
+            display: block;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        .project-link:hover {
+            text-decoration: underline;
+        }
+
+        .project-date {
+            color: #a0aec0;
+            font-size: 0.9em;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* === UTILITY CLASSES === */
+        .hidden {
+            display: none !important;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 40px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 40px;
+            color: #718096;
+            background: #f7fafc;
+            border-radius: 15px;
+            border: 2px dashed #cbd5e0;
+        }
+
+        .empty-state p {
+            font-size: 1.1em;
+            margin-bottom: 0;
+        }
+
+        /* === RESPONSIVE DESIGN === */
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+                margin: 10px;
+            }
+
+            header h1 {
+                font-size: 2.2em;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                text-align: center;
+            }
+
+            .project-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Vercel Instant Deployer</h1>
+            <p>Deploy website ke Vercel hanya dengan 1 klik! Upload file HTML/CSS/JS dan dapatkan link live dalam hitungan detik.</p>
+        </header>
+
+        <!-- Tombol Tambah Project -->
+        <div class="add-project-section" id="addProjectSection">
+            <button class="btn-primary" onclick="showDeployForm()">
+                ➕ Tambahkan Project Baru
+            </button>
+        </div>
+
+        <!-- Form Deploy -->
+        <div class="deploy-form hidden" id="deployForm">
+            <h2 style="color: #2d3748; margin-bottom: 30px; text-align: center;">🚀 Deploy Project Baru</h2>
+            
+            <div class="form-group">
+                <label for="siteName">📁 Nama Project:</label>
+                <input type="text" id="siteName" placeholder="contoh: Portfolio Saya yang Keren" required>
+                <small style="color: #718096; font-size: 0.9em; margin-top: 5px; display: block;">
+                    Nama ini akan digunakan untuk membuat URL website-mu
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="projectName">🌐 Nama Website:</label>
+                <input type="text" id="projectName" placeholder="contoh: my-portofolio" required>
+                <small style="color: #718096; font-size: 0.9em; margin-top: 5px; display: block;">
+                    Judul website yang akan ditampilkan di browser
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="fileUpload">📎 Upload File Website:</label>
+                <input type="file" id="fileUpload" multiple accept=".html,.css,.js,.png,.jpg,.jpeg,.json,.txt,.md">
+                <small style="color: #718096; font-size: 0.9em; margin-top: 5px; display: block;">
+                    Pilih file HTML, CSS, JavaScript, gambar, dll. File "index.html" akan menjadi halaman utama.
+                </small>
+                <div id="fileList" class="file-list">
+                    <div style="color: #a0aec0; text-align: center;">Belum ada file yang dipilih</div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-secondary" onclick="hideDeployForm()">❌ Batal</button>
+                <button class="btn-primary" onclick="deployProject()" id="deployBtn">
+                    🚀 Deploy Sekarang!
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading hidden" id="loadingSection">
+            <div class="spinner"></div>
+            <p>Sedang mendeploy ke Vercel<span class="loading-dots"></span></p>
+            <p style="font-size: 0.9em; opacity: 0.7;">Ini mungkin butuh waktu 30-60 detik</p>
+        </div>
+
+        <!-- Hasil Deploy -->
+        <div class="result hidden" id="resultSection">
+            <h3>✅ Deploy Berhasil!</h3>
+            <p>Website kamu sudah live dan bisa diakses di:</p>
+            <a href="#" target="_blank" id="deployLink" class="deploy-link"></a>
+            <p style="margin-top: 20px;">Mau buat project lain?</p>
+            <button class="btn-primary" onclick="addNewProject()" style="background: white; color: #48bb78;">
+                ➕ Buat Project Lagi
+            </button>
+        </div>
+
+        <!-- Daftar Project -->
+        <div class="projects-section" id="projectsSection">
+            <h2>📂 Project Yang Sudah Dideploy</h2>
+            <div id="projectsList" class="projects-list">
+                <!-- Project list akan muncul di sini -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === JAVASCRIPT APPLICATION ===
+        class VercelDeployer {
+            constructor() {
+                this.projects = JSON.parse(localStorage.getItem('vercelProjects')) || [];
+                this.init();
+            }
+
+            init() {
+                this.renderProjects();
+                this.setupFileUpload();
+                console.log('🚀 Vercel Deployer initialized');
+            }
+
+            setupFileUpload() {
+                const fileUpload = document.getElementById('fileUpload');
+                const fileList = document.getElementById('fileList');
+
+                fileUpload.addEventListener('change', (e) => {
+                    const files = Array.from(e.target.files);
+                    
+                    if (files.length === 0) {
+                        fileList.innerHTML = '<div style="color: #a0aec0; text-align: center;">Belum ada file yang dipilih</div>';
+                        return;
+                    }
+
+                    fileList.innerHTML = files.map(file => `
+                        <div class="file-item">
+                            <span class="file-name">📄 ${file.name}</span>
+                            <span class="file-size">${this.formatFileSize(file.size)}</span>
+                        </div>
+                    `).join('');
+                });
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            async deployProject() {
+                const projectName = document.getElementById('projectName').value.trim();
+                const siteName = document.getElementById('siteName').value.trim();
+                const files = document.getElementById('fileUpload').files;
+
+                // Validation
+                if (!projectName) {
+                    alert('❌ Harap isi nama project!');
+                    return;
+                }
+
+                if (!siteName) {
+                    alert('❌ Harap isi nama website!');
+                    return;
+                }
+
+                if (files.length === 0) {
+                    alert('❌ Harap upload minimal 1 file!');
+                    return;
+                }
+
+                // Show loading
+                this.showLoading();
+
+                try {
+                    const formData = new FormData();
+                    formData.append('projectName', projectName);
+                    formData.append('siteName', siteName);
+                    
+                    // Add all files
+                    Array.from(files).forEach(file => {
+                        formData.append('files', file);
+                    });
+
+                    console.log('📤 Sending deployment request...');
+
+                    // Send to backend API
+                    const response = await fetch('/api/deploy', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        console.log('✅ Deployment successful:', result.url);
+                        
+                        const projectData = {
+                            id: Date.now().toString(),
+                            name: projectName,
+                            siteName: siteName,
+                            url: result.url,
+                            projectId: result.projectId,
+                            deployDate: new Date().toLocaleString('id-ID'),
+                            timestamp: Date.now()
+                        };
+
+                        this.saveProject(projectData);
+                        this.showResult(result.url);
+                    } else {
+                        throw new Error(result.error || 'Deployment gagal');
+                    }
+
+                } catch (error) {
+                    console.error('❌ Deployment error:', error);
+                    alert('❌ Error: ' + error.message);
+                    this.hideLoading();
+                }
+            }
+
+            saveProject(projectData) {
+                // Add to beginning of array (newest first)
+                this.projects.unshift(projectData);
+                
+                // Keep only last 20 projects
+                if (this.projects.length > 20) {
+                    this.projects = this.projects.slice(0, 20);
+                }
+                
+                localStorage.setItem('vercelProjects', JSON.stringify(this.projects));
+                this.renderProjects();
+            }
+
+            renderProjects() {
+                const projectsList = document.getElementById('projectsList');
+                
+                if (this.projects.length === 0) {
+                    projectsList.innerHTML = `
+                        <div class="empty-state">
+                            <p>📭 Belum ada project yang dideploy</p>
+                            <p style="font-size: 0.9em; margin-top: 10px;">Klik "Tambahkan Project Baru" untuk memulai!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                projectsList.innerHTML = this.projects.map(project => `
+                    <div class="project-card">
+                        <div class="project-name">${this.escapeHtml(project.name)}</div>
+                        <div class="project-site">${this.escapeHtml(project.siteName)}</div>
+                        <a href="${project.url}" target="_blank" class="project-link">${project.url}</a>
+                        <div class="project-date">
+                            📅 Deployed: ${project.deployDate}
+                            ${project.projectId ? `<br>🆔 Project ID: ${project.projectId}` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            escapeHtml(unsafe) {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            showLoading() {
+                document.getElementById('deployForm').classList.add('hidden');
+                document.getElementById('loadingSection').classList.remove('hidden');
+            }
+
+            hideLoading() {
+                document.getElementById('loadingSection').classList.add('hidden');
+            }
+
+            showResult(url) {
+                this.hideLoading();
+                const deployLink = document.getElementById('deployLink');
+                deployLink.href = url;
+                deployLink.textContent = url;
+                document.getElementById('resultSection').classList.remove('hidden');
+                
+                // Scroll to result
+                document.getElementById('resultSection').scrollIntoView({ 
+                    behavior: 'smooth' 
+                });
+            }
+        }
+
+        // Global functions untuk HTML onclick
+        function showDeployForm() {
+            document.getElementById('addProjectSection').classList.add('hidden');
+            document.getElementById('deployForm').classList.remove('hidden');
+            document.getElementById('projectsSection').classList.add('hidden');
+            
+            // Scroll to form
+            document.getElementById('deployForm').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        function hideDeployForm() {
+            document.getElementById('deployForm').classList.add('hidden');
+            document.getElementById('addProjectSection').classList.remove('hidden');
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('projectsSection').classList.remove('hidden');
+            
+            // Reset form
+            resetForm();
+        }
+
+        function addNewProject() {
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('addProjectSection').classList.remove('hidden');
+            document.getElementById('projectsSection').classList.remove('hidden');
+            
+            // Reset form
+            resetForm();
+        }
+
+        function resetForm() {
+            document.getElementById('projectName').value = '';
+            document.getElementById('siteName').value = '';
+            document.getElementById('fileUpload').value = '';
+            document.getElementById('fileList').innerHTML = '<div style="color: #a0aec0; text-align: center;">Belum ada file yang dipilih</div>';
+        }
+
+        function deployProject() {
+            if (window.deployer) {
+                window.deployer.deployProject();
+            }
+        }
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            window.deployer = new VercelDeployer();
+        });
+    </script>
+</body>
+</html>

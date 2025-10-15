@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "functions": {
+    "api/deploy.js": {
+      "runtime": "@vercel/node@latest",
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
+  "env": {
+    "VERCEL_TOKEN": "@vercel-token"
+  },
+  "builds": [
+    {
+      "src": "api/deploy.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/.*",
+      "dest": "/api/deploy.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}

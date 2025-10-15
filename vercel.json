@@ -8,7 +8,7 @@
     }
   },
   "env": {
-    "VERCEL_TOKEN": "@vercel-token"
+    "DAWG_TOKEN": "@vercel-token"
   },
   "builds": [
     {

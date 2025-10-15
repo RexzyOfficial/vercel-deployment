@@ -1,5 +1,5 @@
 // Vercel Serverless Function - Real Vercel API Implementation
-const VERCEL_TOKEN = process.env.VERCEL_TOKEN;
+const DAWG_TOKEN = process.env.DAWG_TOKEN;
 
 export default async function handler(req, res) {
   // Enable CORS
@@ -20,8 +20,8 @@ export default async function handler(req, res) {
     console.log('🚀 Starting Vercel deployment process...');
 
     // Check Vercel Token
-    if (!VERCEL_TOKEN) {
-      throw new Error('VERCEL_TOKEN environment variable is not set. Please add your Vercel token in environment variables.');
+    if (!DAWG_TOKEN) {
+      throw new Error('DAWG_TOKEN environment variable is not set. Please add your Vercel token in environment variables.');
     }
 
     // Get form data from request
@@ -88,7 +88,7 @@ async function createOrGetProject(projectName) {
     const createResponse = await fetch('https://api.vercel.com/v9/projects', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${VERCEL_TOKEN}`,
+        'Authorization': `Bearer ${DAWG_TOKEN}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -110,7 +110,7 @@ async function createOrGetProject(projectName) {
       
       const getResponse = await fetch(`https://api.vercel.com/v9/projects/${projectName}`, {
         headers: {
-          'Authorization': `Bearer ${VERCEL_TOKEN}`
+          'Authorization': `Bearer ${DAWG_TOKEN}`
         }
       });
 
@@ -219,7 +219,7 @@ async function createDeployment(project, siteName) {
     const deploymentResponse = await fetch('https://api.vercel.com/v13/deployments', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${VERCEL_TOKEN}`,
+        'Authorization': `Bearer ${DAWG_TOKEN}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(deploymentPayload)
@@ -245,7 +245,7 @@ async function waitForDeploymentReady(deploymentId, deploymentUrl, maxAttempts =
     try {
       const statusResponse = await fetch(`https://api.vercel.com/v13/deployments/${deploymentId}`, {
         headers: {
-          'Authorization': `Bearer ${VERCEL_TOKEN}`
+          'Authorization': `Bearer ${DAWG_TOKEN}`
         }
       });
 
@@ -291,4 +291,4 @@ async function waitForDeploymentReady(deploymentId, deploymentUrl, maxAttempts =
   }
 
   throw new Error('Deployment timeout: Maximum attempts reached');
-}
+                                             }

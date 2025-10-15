@@ -1,15 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/deploy.js": {
-      "runtime": "@vercel/node@latest",
-      "maxDuration": 60,
-      "memory": 1024
-    }
-  },
-  "env": {
-    "DAWG_TOKEN": "@vercel-token"
-  },
   "builds": [
     {
       "src": "api/deploy.js",
@@ -22,12 +12,21 @@
   ],
   "routes": [
     {
-      "src": "/api/.*",
-      "dest": "/api/deploy.js"
+      "src": "/api/deploy",
+      "methods": ["POST", "OPTIONS"],
+      "dest": "/api/deploy.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+        "Access-Control-Allow-Headers": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+      }
     },
     {
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ]
+  ],
+  "env": {
+    "VERCEL_TOKEN": "@vercel-token"
+  }
 }
